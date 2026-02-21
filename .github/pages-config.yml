@@ -1,0 +1,5 @@
+# GitHub Pages Configuration
+# This file tells GitHub to deploy from the main branch
+
+# Deploy from main branch at root
+# GitHub will automatically build and deploy this site
