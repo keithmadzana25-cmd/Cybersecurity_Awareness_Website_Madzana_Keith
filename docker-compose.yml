@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    container_name: cybersecurity-db
+    environment:
+      POSTGRES_USER: cybersecurity_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: cybersecurity_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cybersecurity_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cybersecurity-network
+
+  # Flask Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cybersecurity-backend
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://cybersecurity_user:secure_password@db:5432/cybersecurity_db
+      JWT_SECRET_KEY: your-super-secret-key-change-in-production
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./:/workspace
+      - ./backend:/app
+    networks:
+      - cybersecurity-network
+    command: python run.py
+
+  # Frontend (Optional - serves static files)
+  frontend:
+    image: nginx:alpine
+    container_name: cybersecurity-frontend
+    ports:
+      - "80:80"
+      - "8000:8000"
+    volumes:
+      - ./:/usr/share/nginx/html
+    networks:
+      - cybersecurity-network
+
+volumes:
+  postgres_data:
+
+networks:
+  cybersecurity-network:
+    driver: bridge

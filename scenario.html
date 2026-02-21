@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="scenario.png">
+    <title>Cybersecurity Scenario Questions - Madzana Keith Co.</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="scenario-styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <h1>CyberSecurity by M.K</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#info">Security Tips</a></li>
+                        <li><a href="index.html#quiz">Quiz</a></li>
+                        <li><a href="scenario.html">Scenarios</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="background-overlay"></div>
+    
+    <div class="container">
+        <div class="scenario-header">
+            <h1><i class="fas fa-tasks"></i> Cybersecurity Scenario Questions <i class="fas fa-tasks"></i></h1>
+            <p class="subtitle">Test your practical knowledge with real-world security scenarios</p>
+        </div>
+
+        <div class="question-box" id="questionBox">
+            <div class="question-header">
+                <div class="question-number" id="questionNumber">Question 1</div>
+                <div class="difficulty-badge" id="difficultyBadge">Intermediate</div>
+            </div>
+            
+            <div class="question-text" id="questionText"></div>
+            
+            <div class="answer-section" id="answerSection">
+                <div class="answer-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>Recommended Response</h3>
+                </div>
+                <div class="answer-text" id="answerText"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="nextBtn" class="btn btn-primary">Show Answer</button>
+                <button id="restartBtn" class="btn btn-success" style="display: none;">Restart Scenarios</button>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-text" id="progressText">Question 1 of 30</span>
+        </div>
+
+        <div class="scenario-info">
+            <div class="info-card">
+                <i class="fas fa-info-circle"></i>
+                <h4>How to Use</h4>
+                <p>Read each cybersecurity scenario carefully, think about how you would respond, then click "Show Answer" to compare with the recommended response.</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h4>Learning Goal</h4>
+                <p>Develop practical problem-solving skills for real-world cybersecurity incidents and threats.</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Scenarios Covered</h4>
+                <p>Incident response, malware, DDoS attacks, phishing, access control, and more.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer id="about">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <i class="fas fa-lock"></i>
+                    <h1>CyberSecurity by M.K</h1>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <p>Empowering individuals and organizations with cyber security awareness and best practices.</p>
+                <div class="contact-info">
+                    <h4>Get in Touch</h4>
+                    <div class="contact-links">
+                        <a href="mailto:keith.madzana25@vupune.ac.in" class="contact-link">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email Us</span>
+                        </a>
+                        <a href="https://wa.me/263714415163" class="contact-link" target="_blank">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>WhatsApp</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="social-icons">
+                    <a href="https://www.linkedin.com/in/keith-madzana-040316386" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/keithmadzana25-cmd" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://youtube.com/@m.kmighty?si=bsdVH7_eii7dQV8I" aria-label="YouTube" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+                <p class="copyright">&copy; 2026 CyberSecurity Awareness Initiative. All rights reserved. Madzana Keith Co.(Pvt Ltd)</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="scenario-script.js"></script>
+</body>
+</html>
