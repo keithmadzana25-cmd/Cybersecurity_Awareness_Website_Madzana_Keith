@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import User, QuizAttempt, Leaderboard
 from datetime import datetime
+import os, json
 
 bp = Blueprint('quiz', __name__, url_prefix='/api/quiz')
 
@@ -25,31 +26,45 @@ def submit_quiz():
     answers = data['answers']  # List of {question_id, selected_answer}
     time_spent = data['time_spent']  # Time in seconds
     
-    # Mock quiz questions for verification (you'll want to store these in DB)
-    QUIZ_QUESTIONS = [
-        {'id': 0, 'correct': 2},  # Question 0, correct answer is index 2
-        {'id': 1, 'correct': 1},
-        {'id': 2, 'correct': 3},
-        {'id': 3, 'correct': 0},
-        {'id': 4, 'correct': 2},
-        {'id': 5, 'correct': 1},
-        {'id': 6, 'correct': 3},
-        {'id': 7, 'correct': 2},
-        {'id': 8, 'correct': 1},
-        {'id': 9, 'correct': 0},
-    ]
-    
-    # Calculate score
+    # Server-side authoritative scoring: load question keys from data file
+    questions_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'quiz_questions.json')
+    correct_map = {}
+    try:
+        with open(questions_file, 'r') as f:
+            q_list = json.load(f)
+            for q in q_list:
+                correct_map[int(q.get('id'))] = int(q.get('correct'))
+    except Exception:
+        correct_map = {}
+
     correct_count = 0
-    for answer in answers:
-        q_id = answer.get('question_id')
-        selected = answer.get('selected_answer')
-        
-        if q_id < len(QUIZ_QUESTIONS):
-            if selected == QUIZ_QUESTIONS[q_id]['correct']:
+    total_questions = len(correct_map) if correct_map else len(answers) or 10
+
+    if correct_map:
+        for answer in answers:
+            q_id = answer.get('question_id')
+            selected = answer.get('selected_answer')
+            if q_id is None or selected is None:
+                continue
+            if correct_map.get(int(q_id)) == int(selected):
                 correct_count += 1
-    
-    score = int((correct_count / len(QUIZ_QUESTIONS)) * 100)
+        score = int((correct_count / total_questions) * 100)
+    else:
+        # As a fallback, accept client-provided score if present
+        if 'score' in data and isinstance(data['score'], int):
+            score = int(data['score'])
+            correct_count = int(data.get('correct_answers', 0))
+        else:
+            # Best-effort: count answers provided but cannot validate
+            correct_count = 0
+            provided = 0
+            for answer in answers:
+                if answer is None:
+                    continue
+                if answer.get('selected_answer') is not None:
+                    provided += 1
+            provided = provided or total_questions
+            score = int((correct_count / provided) * 100) if provided > 0 else 0
     
     # Save quiz attempt
     attempt = QuizAttempt(

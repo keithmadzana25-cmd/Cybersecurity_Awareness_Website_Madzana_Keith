@@ -93,10 +93,14 @@ class APIClient {
      * Quiz endpoints
      */
     async submitQuiz(answers, timeSpent) {
-        return this.request('/api/quiz/submit', 'POST', {
-            answers,
-            time_spent: timeSpent
-        });
+        // If caller computed score, include it in payload (optional)
+        const payload = { answers, time_spent: timeSpent };
+        if (typeof answers.score === 'number') {
+            payload.score = answers.score;
+            payload.correct_answers = answers.correct_answers || 0;
+        }
+
+        return this.request('/api/quiz/submit', 'POST', payload);
     }
 
     async getQuizHistory() {
