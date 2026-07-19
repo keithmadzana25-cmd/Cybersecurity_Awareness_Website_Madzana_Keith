@@ -248,39 +248,40 @@ function updateQuizButtons() {
 }
 
 function submitQuiz() {
-    // Calculate score
+    const answers = [];
+    const optionElements = document.querySelectorAll('.quiz-option, .option');
+
+    optionElements.forEach((option, index) => {
+        if (option.classList.contains('selected')) {
+            answers.push({
+                question_id: Math.floor(index / 4),
+                selected_answer: index % 4
+            });
+        }
+    });
+
+    const timeSpent = Math.floor((Date.now() - quizStartTime) / 1000);
+
+    if (typeof window.quizModule?.submitQuiz === 'function') {
+        window.quizModule.submitQuiz(answers, timeSpent);
+        return;
+    }
+
+    // Fallback local scoring if the backend module is unavailable
     quizScore = 0;
     quizAnswers.forEach((answer, index) => {
         if (answer === quizQuestions[index].correct) {
             quizScore++;
         }
     });
-    
+
     const percentage = (quizScore / quizQuestions.length) * 100;
-    
-    // Show results
-    const resultEl = document.getElementById('result');
-    resultEl.classList.add('show');
-    resultEl.innerHTML = `
-        <h3>Quiz Complete!</h3>
-        <p style="font-size: 2em; color: #1e40af; margin: 1rem 0; font-weight: bold;">
-            ${quizScore}/${quizQuestions.length} (${Math.round(percentage)}%)
-        </p>
-        <p style="margin-bottom: 1rem;">
-            ${getResultMessage(percentage)}
-        </p>
-        <button class="quiz-btn" onclick="retakeQuiz()">Retake Quiz</button>
-    `;
-    
-    // Disable quiz controls
-    document.getElementById('prev-btn').disabled = true;
-    document.getElementById('next-btn').disabled = true;
-    
-    // Update analytics
-    updateAnalytics(percentage);
-    
-    // Show detailed results
-    showQuizExplanations();
+    showQuizFeedback({
+        score: Math.round(percentage),
+        correct_answers: quizScore,
+        total_questions: quizQuestions.length,
+        security_level: calculateSecurityLevel(Math.round(percentage))
+    }, quizAnswers);
 }
 
 function retakeQuiz() {
@@ -302,11 +303,34 @@ function getResultMessage(percentage) {
     }
 }
 
-function showQuizExplanations() {
+function showQuizFeedback(result, answersToReview = quizAnswers) {
+    const resultEl = document.getElementById('result');
+    const percentage = result?.score ?? 0;
+    resultEl.classList.add('show');
+    resultEl.innerHTML = `
+        <h3>Quiz Complete!</h3>
+        <p style="font-size: 2em; color: #1e40af; margin: 1rem 0; font-weight: bold;">
+            ${result?.correct_answers ?? 0}/${result?.total_questions ?? quizQuestions.length} (${Math.round(percentage)}%)
+        </p>
+        <p style="margin-bottom: 1rem;">
+            ${getResultMessage(percentage)}
+        </p>
+        <button class="quiz-btn" onclick="retakeQuiz()">Retake Quiz</button>
+    `;
+
+    document.getElementById('prev-btn').disabled = true;
+    document.getElementById('next-btn').disabled = true;
+    updateAnalytics(percentage);
+    showQuizExplanations(answersToReview);
+}
+
+window.showQuizFeedback = showQuizFeedback;
+
+function showQuizExplanations(answersToReview = quizAnswers) {
     const resultEl = document.getElementById('result');
     let explanations = '<h4 style="margin-top: 2rem;">Answer Review:</h4>';
     
-    quizAnswers.forEach((answer, index) => {
+    answersToReview.forEach((answer, index) => {
         const question = quizQuestions[index];
         const isCorrect = answer === question.correct;
         const statusIcon = isCorrect ? '✓' : '✗';

@@ -17,20 +17,35 @@ class QuizModule {
             return;
         }
 
+        // Compute score client-side to avoid mismatch with backend question bank
+        let correctCount = 0;
         try {
-            const response = await api.submitQuiz(answers, timeSpent);
-            
-            // Show result with backend validation
-            alert(`
-Quiz Submitted!
-Score: ${response.score}%
-Correct: ${response.correct_answers}/${response.total_questions}
-Security Level: ${response.security_level}
-            `);
-            
-            // Redirect to stats page
-            await this.showQuizStats();
-            
+            answers.forEach(a => {
+                const q = window.quizQuestions ? window.quizQuestions[a.question_id] : null;
+                if (q && typeof a.selected_answer !== 'undefined') {
+                    if (a.selected_answer === q.correct) correctCount += 1;
+                }
+            });
+        } catch (e) {
+            // ignore and let backend compute if available
+        }
+
+        const scorePercent = Math.round((correctCount / (window.quizQuestions ? window.quizQuestions.length : 10)) * 100);
+
+        // Attach score metadata to answers object so api-client can include it
+        const ansPayload = answers;
+        ansPayload.score = scorePercent;
+        ansPayload.correct_answers = correctCount;
+
+        try {
+            const response = await api.submitQuiz(ansPayload, timeSpent);
+
+            if (typeof window.showQuizFeedback === 'function') {
+                window.showQuizFeedback(response, answers);
+            } else {
+                alert(`Quiz Submitted! Score: ${response.score}%`);
+            }
+
             return response;
         } catch (error) {
             alert('Failed to submit quiz: ' + error.message);
@@ -101,26 +116,7 @@ Security Level: ${response.security_level}
 
 // Initialize quiz module
 const quizModule = new QuizModule();
-
-// Override the existing submitQuiz function
-const originalSubmitQuiz = window.submitQuiz;
-
-window.submitQuiz = async function() {
-    const answers = [];
-    const options = document.querySelectorAll('.quiz-option');
-    
-    options.forEach((option, idx) => {
-        if (option.classList.contains('selected')) {
-            answers.push({
-                question_id: Math.floor(idx / 4), // Assuming 4 options per question
-                selected_answer: idx % 4
-            });
-        }
-    });
-
-    const timeSpent = Math.floor((Date.now() - quizModule.startTime) / 1000);
-    await quizModule.submitQuiz(answers, timeSpent);
-};
+window.quizModule = quizModule;
 
 // Track quiz start time
 document.addEventListener('DOMContentLoaded', () => {

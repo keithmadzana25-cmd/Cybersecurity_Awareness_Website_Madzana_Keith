@@ -6,14 +6,14 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
-    CORS_ORIGINS = ["http://localhost:8000", "http://localhost:3000"]
+    CORS_ORIGINS = ["http://localhost:8000", "http://localhost:3000", "http://127.0.0.1:8000"]
 
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'postgresql://user:password@localhost:5432/cybersecurity_db'
+        'sqlite:///./cybersecurity.db'
     )
 
 class ProductionConfig(Config):

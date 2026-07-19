@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.env
+.env.*
+.python-version
+
+# Distribution / packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# VSCode
+.vscode/
+
+# Pytest
+.pytest_cache/
+
+# Docker
+docker-compose.override.yml
+
+# IDEs
+.idea/
+
+# System
+.DS_Store
+
+# Node
+node_modules/
+
+# Database
+*.db
